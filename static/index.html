@@ -152,6 +152,81 @@
   .skeleton { padding:16px; display:flex; flex-direction:column; gap:8px; }
   .skel-line { height:11px; background:linear-gradient(90deg,#1e2530 25%,#252d3a 50%,#1e2530 75%); background-size:200% 100%; border-radius:5px; animation:shimmer 1.4s infinite; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ── Request Panel ──────────────────────────────── */
+  .req-panel {
+    max-width:1600px; margin:0 auto 28px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:16px;
+  }
+  @media(max-width:780px){ .req-panel{ grid-template-columns:1fr; } }
+
+  .req-box {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; overflow:hidden;
+  }
+  .req-box-header {
+    display:flex; align-items:center; gap:8px;
+    padding:11px 16px 10px; border-bottom:1px solid var(--border);
+    font-size:0.78rem; font-weight:700; color:var(--muted); letter-spacing:0.04em; text-transform:uppercase;
+  }
+  .req-box-header .dot { width:8px; height:8px; border-radius:50%; }
+  .dot-green { background:#34d399; }
+  .dot-orange{ background:#f59e0b; }
+
+  /* Terminal HTTP block */
+  .http-block {
+    font-family:'JetBrains Mono',monospace; font-size:0.78rem;
+    padding:14px 16px; line-height:1.8;
+  }
+  .http-method  { color:#34d399; font-weight:700; }
+  .http-path    { color:#e6edf3; font-weight:600; }
+  .http-version { color:#4b5563; }
+  .http-key     { color:#7dd3fc; }
+  .http-val     { color:#fbbf24; }
+  .http-val.ua-val { color:#c084fc; }
+  .http-comment { color:#4b5563; font-style:italic; }
+
+  /* Common fields table */
+  .common-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+  .common-table td { padding:7px 16px; border-bottom:1px solid #1e2530; }
+  .common-table tr:last-child td { border-bottom:none; }
+  .common-table .ck { color:var(--muted); font-weight:500; width:130px; }
+  .common-table .cv { color:var(--text); font-weight:600; }
+  .same-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    background:rgba(52,211,153,0.12); color:#34d399;
+    border:1px solid rgba(52,211,153,0.25);
+    border-radius:20px; padding:1px 8px; font-size:0.67rem; font-weight:700;
+    margin-left:6px; vertical-align:middle;
+  }
+
+  /* UA comparison strip */
+  .ua-compare { padding:12px 16px; display:flex; flex-direction:column; gap:6px; }
+  .ua-row {
+    display:flex; align-items:flex-start; gap:8px;
+    font-family:'JetBrains Mono',monospace; font-size:0.68rem; line-height:1.5;
+  }
+  .ua-badge {
+    flex-shrink:0; padding:1px 8px; border-radius:10px;
+    font-size:0.65rem; font-weight:700; min-width:80px; text-align:center;
+  }
+  .ua-badge.browser      { background:var(--browser-glow);      color:var(--browser-accent); }
+  .ua-badge.gptbot       { background:var(--gptbot-glow);       color:var(--gptbot-accent); }
+  .ua-badge.googlebot    { background:var(--googlebot-glow);    color:var(--googlebot-accent); }
+  .ua-badge.claudebot    { background:var(--claudebot-glow);    color:var(--claudebot-accent); }
+  .ua-badge.perplexitybot{ background:var(--perplexitybot-glow);color:var(--perplexitybot-accent); }
+  .ua-string { color:#8b949e; word-break:break-all; }
+
+  /* Arrow divider */
+  .arrow-divider {
+    text-align:center; margin:0 auto 20px;
+    font-size:1.4rem; color:var(--muted);
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+  .arrow-label { font-size:0.72rem; color:var(--muted); display:block; margin-top:2px; letter-spacing:0.05em; }
 </style>
 </head>
 <body>
@@ -164,6 +239,56 @@
 <div class="controls">
   <button class="btn btn-all" onclick="fetchAll()">⚡ Fetch All Five</button>
   <button class="btn btn-clear" onclick="clearAll()">✕ Clear</button>
+</div>
+
+<!-- ── Request Panel ─────────────────────────────────── -->
+<div class="req-panel">
+
+  <!-- Left: HTTP request terminal -->
+  <div class="req-box">
+    <div class="req-box-header"><span class="dot dot-green"></span>HTTP Request — same for all 5 bots</div>
+    <div class="http-block">
+      <span class="http-method">GET</span>
+      <span class="http-path"> /product</span>
+      <span class="http-version"> HTTP/1.1</span><br>
+      <span class="http-key">Host: </span><span class="http-val">bot-discovery.onrender.com</span><br>
+      <span class="http-key">Accept: </span><span class="http-val">application/json</span><br>
+      <span class="http-key">User-Agent: </span><span class="http-val ua-val">← only this changes ↓</span><br>
+      <br>
+      <span class="http-comment"># Same URL · Same endpoint · Same product</span><br>
+      <span class="http-comment"># Only the User-Agent header differs per bot</span>
+    </div>
+
+    <!-- UA comparison -->
+    <div style="border-top:1px solid var(--border); padding:10px 16px 4px; font-size:0.7rem; color:var(--muted); font-weight:600; letter-spacing:0.04em; text-transform:uppercase;">User-Agent per bot</div>
+    <div class="ua-compare">
+      <div class="ua-row"><span class="ua-badge browser">Browser</span><span class="ua-string">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36</span></div>
+      <div class="ua-row"><span class="ua-badge gptbot">GPTBot</span><span class="ua-string">Mozilla/5.0 (compatible; GPTBot/1.0; +https://openai.com/gptbot)</span></div>
+      <div class="ua-row"><span class="ua-badge googlebot">Googlebot</span><span class="ua-string">Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)</span></div>
+      <div class="ua-row"><span class="ua-badge claudebot">ClaudeBot</span><span class="ua-string">Mozilla/5.0 (compatible; ClaudeBot/1.0; +https://anthropic.com/claude-bot)</span></div>
+      <div class="ua-row"><span class="ua-badge perplexitybot">Perplexity</span><span class="ua-string">Mozilla/5.0 (compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)</span></div>
+    </div>
+  </div>
+
+  <!-- Right: Common response fields (identical across all 5) -->
+  <div class="req-box">
+    <div class="req-box-header"><span class="dot dot-orange"></span>Common Response Fields — identical across all bots</div>
+    <table class="common-table" id="common-table">
+      <tr><td class="ck">Product ID</td>   <td class="cv" id="cf-id"><span style="color:#4b5563">fetching…</span></td></tr>
+      <tr><td class="ck">Product Name</td> <td class="cv" id="cf-name"><span style="color:#4b5563">fetching…</span></td></tr>
+      <tr><td class="ck">Price</td>        <td class="cv" id="cf-price"><span style="color:#4b5563">fetching…</span></td></tr>
+      <tr><td class="ck">Availability</td> <td class="cv" id="cf-avail"><span style="color:#4b5563">fetching…</span></td></tr>
+      <tr><td class="ck">Endpoint</td>     <td class="cv"><span style="font-family:monospace;font-size:0.78rem">GET /product</span><span class="same-badge">✓ SAME</span></td></tr>
+      <tr><td class="ck">Method</td>       <td class="cv">HTTP GET<span class="same-badge">✓ SAME</span></td></tr>
+      <tr><td class="ck">Variable</td>     <td style="color:#c084fc;font-size:0.78rem;font-weight:600">User-Agent header only ←</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<div class="arrow-divider">
+  ↓↓↓↓↓
+  <span class="arrow-label">5 different responses based on User-Agent</span>
 </div>
 
 <div class="grid">
@@ -227,10 +352,22 @@
 
 <script>
 const KINDS = ['browser','gptbot','googlebot','claudebot','perplexitybot'];
+let commonFieldsFilled = false;
 
-const ICONS = {
-  browser:'💬', gptbot:'🤖', googlebot:'🔍', claudebot:'🧠', perplexitybot:'⚡'
-};
+function fillCommonFields(r) {
+  if (commonFieldsFilled) return;
+  commonFieldsFilled = true;
+  const badge = `<span class="same-badge">✓ SAME</span>`;
+  document.getElementById('cf-id').innerHTML    = `<span style="font-family:monospace">${r.product_id}</span>${badge}`;
+  document.getElementById('cf-name').innerHTML  = r.product_name + badge;
+  document.getElementById('cf-price').innerHTML = `<span style="color:#34d399">${r.price}</span>${badge}`;
+  document.getElementById('cf-avail').innerHTML = r.availability + badge;
+  // Flash the panel to signal it updated
+  const table = document.getElementById('common-table');
+  table.style.transition = 'opacity 0.3s';
+  table.style.opacity = '0.3';
+  setTimeout(() => { table.style.opacity = '1'; }, 200);
+}
 
 function setBadge(kind, cls, text) {
   const b = document.getElementById('badge-'+kind);
@@ -307,6 +444,7 @@ async function fetchKind(kind) {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     renderCard(kind, data);
+    fillCommonFields(data.response);   // populate shared fields panel
     document.getElementById('raw-'+kind).textContent = JSON.stringify(data,null,2);
     setBadge(kind,'badge-ok',`HTTP ${data.http_status}`);
   } catch(err) {
@@ -317,6 +455,10 @@ async function fetchKind(kind) {
 
 function fetchAll()  { KINDS.forEach(fetchKind); }
 function clearAll()  {
+  commonFieldsFilled = false;
+  ['cf-id','cf-name','cf-price','cf-avail'].forEach(id => {
+    document.getElementById(id).innerHTML = '<span style="color:#4b5563">—</span>';
+  });
   KINDS.forEach(kind => {
     setBadge(kind,'badge-idle','Idle');
     setBody(kind,`<div class="skeleton"><div class="skel-line" style="width:60%"></div><div class="skel-line" style="width:80%"></div><div class="skel-line" style="width:50%"></div></div>`);
